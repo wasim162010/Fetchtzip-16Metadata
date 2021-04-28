@@ -16,3 +16,5 @@
 #go test -run TestQuerySHA256Url -sha256URL "sha256://0x7e99ecf3a4490e3044ccdf319898d77380a2fc20aae36b6e40327d678399d17b/https:%2F%2Fstorage.googleapis.com%2Ftzip-16%2Ftaco-shop-metadata.json"
 
 #These steps are mentioned in files too.
+
+#Please view 'Sample Screenshots.docx' file for the sample screenshots for the reference. 
