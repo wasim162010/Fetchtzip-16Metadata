@@ -41,6 +41,7 @@ The program takes the url as a command line param.
 For ex :
 
 go run QueryUrl.go "https://storage.googleapis.com/tzip-16/emoji-in-metadata.json"
+
 go run QueryUrl.go  "sha256://0x7e99ecf3a4490e3044ccdf319898d77380a2fc20aae36b6e40327d678399d17b/https:%2F%2Fstorage.googleapis.com%2Ftzip-16%2Ftaco-shop-metadata.json"
 
 */
@@ -76,14 +77,14 @@ func QueryHttpUrl(httpUrl string) (MetaData, error) {
 	}
 
 	if resp.StatusCode == 200 {
-		//We Read the response body on the line below.
+		//Reding the response body contents
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 
 			fmt.Println("Error while reading response body ", err)
 			return MetaData{}, err
 		}
-		//ResponseBody
+
 		err1 := json.Unmarshal(body, &metadata)
 		if err1 != nil {
 			fmt.Println("Error while unmarshalling ", err)
