@@ -34,6 +34,17 @@ type MetaData struct {
 // var sha256Url = "sha256://0x7e99ecf3a4490e3044ccdf319898d77380a2fc20aae36b6e40327d678399d17b/https:%2F%2Fstorage.googleapis.com%2Ftzip-16%2Ftaco-shop-metadata.json"
 //ipfsUrl := "ipfs://QmcMUKkhXowQjCPtDVVXyFJd7W9LmC92Gs5kYH1KjEisdj"
 
+/*
+
+The program takes the url as a command line param.
+
+For ex :
+
+go run QueryUrl.go "https://storage.googleapis.com/tzip-16/emoji-in-metadata.json"
+go run QueryUrl.go  "sha256://0x7e99ecf3a4490e3044ccdf319898d77380a2fc20aae36b6e40327d678399d17b/https:%2F%2Fstorage.googleapis.com%2Ftzip-16%2Ftaco-shop-metadata.json"
+
+*/
+
 func main() {
 
 	urlObj := os.Args[1]
@@ -105,6 +116,7 @@ func QuerySHA256Url(sha256pUrl string) (MetaData, error) {
 		fmt.Println("fetched http url ", fetchedURL)
 
 	}
+
 	metadata, err := QueryHttpUrl(fetchedURL)
 
 	if err != nil {
