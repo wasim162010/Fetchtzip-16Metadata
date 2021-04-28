@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-var metaDataUrl = flag.String("metaDataUrl", "http://www.google.com", "url")
+var metaDataURL = flag.String("metaDataUrl", "https://storage.googleapis.com/tzip-16/emoji-in-metadata.json", "url")
 
 /*
 go test -run TestQueryHttpUrl -metaDataUrl "https://storage.googleapis.com/tzip-16/emoji-in-metadata.json"
@@ -23,7 +23,7 @@ func TestQuerySHA256Url(t *testing.T) {
 
 	fmt.Println("testng TestSHA256")
 
-	metaDataURL := *metaDataUrl
+	metaDataURL := *metaDataURL
 
 	fmt.Println(metaDataURL)
 
@@ -60,7 +60,7 @@ func TestQueryHttpUrl(t *testing.T) {
 
 	fmt.Println("testng TestSHA256")
 
-	metaDataURL := *metaDataUrl
+	metaDataURL := *metaDataURL
 
 	fmt.Println(metaDataURL)
 

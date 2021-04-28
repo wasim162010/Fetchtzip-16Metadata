@@ -93,8 +93,7 @@ func QueryHttpUrl(httpUrl string) (MetaData, error) {
 func QuerySHA256Url(sha256pUrl string) (MetaData, error) {
 
 	fmt.Println("QuerySHA256Url")
-	fetchedURL := s.Split(s.Split(sha256pUrl, "://")[1], "/")[1] //(s.Split(sha256pUrl, "://")[1])
-	fmt.Println("fetchedURLgo is ", fetchedURL)
+	fetchedURL := s.Split(s.Split(sha256pUrl, "://")[1], "/")[1]
 	var metadata MetaData
 
 	if s.Contains(fetchedURL, "%2F%2F") {
