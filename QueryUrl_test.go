@@ -5,8 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
-	s "strings"
+	"net/url"
+	"strings"
 	"testing"
 )
 
@@ -39,14 +41,12 @@ func TestQuerySHA256Url(t *testing.T) {
 
 	fmt.Println(metaDataURL)
 
-	metaDataURL = s.Split(s.Split(metaDataURL, "://")[1], "/")[1]
-
-	if s.Contains(metaDataURL, "%2F%2F") {
-		metaDataURL = s.Replace(metaDataURL, "%2F%2F", "//", -1)
-		if s.Contains(metaDataURL, "%2F") {
-			metaDataURL = s.Replace(metaDataURL, "%2F", "/", -1)
-		}
+	u, err := url.Parse(metaDataURL)
+	if err != nil {
+		log.Fatal(err)
 	}
+	metaDataURL = u.Path
+	metaDataURL = strings.Replace(metaDataURL, "/", "", 1)
 
 	resp, err := http.Get(metaDataURL)
 	if err != nil || resp.StatusCode != 200 {
@@ -55,6 +55,10 @@ func TestQuerySHA256Url(t *testing.T) {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			t.Errorf("Error while reading the response body.Error is  %d.", err)
+		}
+		valResult, err := fetchHashAndValidate(string(body), u.Host)
+		if err != nil {
+			t.Errorf(valResult, err)
 		}
 		var metadata MetaData
 		err1 := json.Unmarshal(body, &metadata)
@@ -95,3 +99,40 @@ func TestQueryHttpUrl(t *testing.T) {
 	}
 
 }
+
+// func TestQuerySHA256Url(t *testing.T) {
+
+// 	fmt.Println("testng TestSHA256")
+
+// 	metaDataURL := *sha256URL
+
+// 	fmt.Println(metaDataURL)
+
+// 	metaDataURL = s.Split(s.Split(metaDataURL, "://")[1], "/")[1]
+
+// 	if s.Contains(metaDataURL, "%2F%2F") {
+// 		metaDataURL = s.Replace(metaDataURL, "%2F%2F", "//", -1)
+// 		if s.Contains(metaDataURL, "%2F") {
+// 			metaDataURL = s.Replace(metaDataURL, "%2F", "/", -1)
+// 		}
+// 	}
+
+// 	resp, err := http.Get(metaDataURL)
+// 	if err != nil || resp.StatusCode != 200 {
+// 		t.Errorf("Error while querying the url.Error is  %d. Response code %d\n", err, resp.StatusCode)
+// 	} else {
+// 		body, err := ioutil.ReadAll(resp.Body)
+// 		if err != nil {
+// 			t.Errorf("Error while reading the response body.Error is  %d.", err)
+// 		}
+// 		var metadata MetaData
+// 		err1 := json.Unmarshal(body, &metadata)
+// 		if err1 != nil {
+// 			t.Errorf("Error while unmarshalling the response.Error is  %d.", err)
+// 		} else {
+// 			fmt.Println("MetaData fetched ", metadata)
+// 		}
+
+// 	}
+
+// }

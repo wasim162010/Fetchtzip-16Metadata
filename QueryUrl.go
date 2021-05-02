@@ -1,13 +1,16 @@
 package main
 
 import (
+	"crypto/sha256"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 	s "strings"
 )
 
@@ -105,20 +108,36 @@ func QueryHttpUrl(httpUrl string) (MetaData, error) {
 func QuerySHA256Url(sha256pUrl string) (MetaData, error) {
 
 	fmt.Println("QuerySHA256Url")
-	fetchedURL := s.Split(s.Split(sha256pUrl, "://")[1], "/")[1]
 	var metadata MetaData
 
-	if s.Contains(fetchedURL, "%2F%2F") {
+	u, err := url.Parse(sha256pUrl)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fetchedURL := u.Path //     // "/https://storage.googleapis.com/tzip-16/taco-shop-metadata.json"
+	fmt.Println("split fetchedURL ", fetchedURL)
+	fetchedURL = strings.Replace(fetchedURL, "/", "", 1)
+	fmt.Println("replace fetchedURL ", fetchedURL) // https://storage.googleapis.com/tzip-16/taco-shop-metadata.json
 
-		fetchedURL = s.Replace(fetchedURL, "%2F%2F", "//", -1)
-		if s.Contains(fetchedURL, "%2F") {
-			fetchedURL = s.Replace(fetchedURL, "%2F", "/", -1)
-		}
-		fmt.Println("fetched http url ", fetchedURL)
-
+	resp, err := http.Get(fetchedURL)
+	if err != nil {
+		fmt.Println("Failed to fetch the date ", err)
+		return MetaData{}, err
+	}
+	defer resp.Body.Close()
+	body, err1 := ioutil.ReadAll(resp.Body)
+	if err1 != nil {
+		fmt.Println("Failed to read the response body ", err)
+		return MetaData{}, err
 	}
 
-	metadata, err := QueryHttpUrl(fetchedURL)
+	fmt.Println("shA PART ", u.Host)
+	valResult, err := fetchHashAndValidate(string(body), u.Host)
+	if err != nil {
+		fmt.Println("Issue while verifying hash ", err)
+		return MetaData{}, err
+	}
+	fmt.Println("resphash value ", valResult)
 
 	if err != nil {
 		fmt.Println("Failed to read the metadata ", err)
@@ -126,5 +145,26 @@ func QuerySHA256Url(sha256pUrl string) (MetaData, error) {
 	}
 
 	return metadata, nil
+}
+
+func fetchHashAndValidate(respBody string, shaPartOfURL string) (string, error) { //able to find rthe sha256 hash
+	fmt.Println("fetchHashAndValidate")
+	h := sha256.New()
+	h.Write([]byte(respBody))
+	hashedval := h.Sum(nil)
+
+	fmt.Printf("%x", hashedval)
+	sha256Hash := "0x" + fmt.Sprintf("%x", hashedval)
+	//	fmt.Println("")
+	//fmt.Println("sha256Hash ", sha256Hash)
+
+	if shaPartOfURL == sha256Hash {
+		//	fmt.Println("Validation passed")
+		return "Validation passed", nil
+	} else {
+		err := errors.New("Hashes did not matched")
+		//	fmt.Println("Hashes did not passed")
+		return "Hashes did not matched", err
+	}
 
 }
